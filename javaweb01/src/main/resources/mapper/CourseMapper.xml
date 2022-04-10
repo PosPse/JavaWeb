@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <!-- namespace表示命名空间 -->
+    <mapper namespace="com.popse.pojo.Course">
+
+    <!-- 结果映射集 -->
+    <resultMap id="courseMap" type="Course">
+        <result property="courseId" column="id"/>
+        <result property="courseName" column="name"/>
+        <result property="courseHours" column="hours"/>
+        <result property="academyId" column="academy_id"/>
+    </resultMap>
+
+    <!-- 根据课程名模糊查询课程信息列表 或 查询所有课程信息列表-->
+    <select id="findCourseByName" parameterType="String" resultMap="courseMap">
+        select * from s_course where name like concat('%',#{courseName},'%')
+    </select>
+
+    <!-- 根据课程ID获取课程信息 -->
+    <select id="findCourseById" parameterType="int" resultMap="courseMap">
+        select * from s_course where id = #{courseId}
+    </select>
+
+    <!-- 根据学院ID获取课程信息列表 -->
+    <select id="findCouserByAcademyId" parameterType="int" resultMap="courseMap">
+        select * from s_course where academy_id = #{academyId}
+    </select>
+
+    <!-- 添加课程信息-->
+    <insert id="addCourse" parameterType="Course">
+        insert into s_course(id, name, hours, academy_id) values (#{courseId}, #{courseName}, #{courseHours}, #{academyId})
+    </insert>
+
+    <!-- 更新课程信息-->
+    <update id="updateCourse" parameterType="Course">
+        update s_course set name = #{courseName}, hours = #{courseHours}, academy_id = #{academyId} where id = #{courseId}
+    </update>
+
+    <!-- 删除课程信息-->
+    <delete id="deleteCourse" parameterType="int">
+        delete from s_course where id = #{courseId}
+    </delete>
+</mapper>
