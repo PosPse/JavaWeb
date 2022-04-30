@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace表示命名空间 -->
+<mapper namespace="com.popse.dao.CourseMapper">
+
+    <!-- 结果映射集 -->
+    <resultMap id="courseMap" type="Course">
+        <result property="courseId" column="id"/>
+        <result property="courseName" column="name"/>
+        <result property="courseHours" column="hours"/>
+        <result property="academyId" column="academy_id"/>
+    </resultMap>
+
+    <!-- 根据课程名模糊查询课程信息列表 或 查询所有课程信息列表-->
+    <select id="findCourseByName" parameterType="String" resultMap="courseMap">
+        select * from s_course where name like concat('%',#{courseName},'%')
+    </select>
+
+    <!-- 查找id不为courseId但课程名为courseName的数据-->
+    <select id="findCourseByIdAndName" resultMap="courseMap">
+        select * from s_course where id != #{arg0} and name = #{arg1}
+    </select>
+
+    <!-- 添加课程信息-->
+    <insert id="addCourse" parameterType="Course" useGeneratedKeys="true" keyProperty="courseId" keyColumn="id">
+        insert into s_course(id, name, hours, academy_id) values (#{courseId}, #{courseName}, #{courseHours}, #{academyId})
+    </insert>
+
+    <!-- 更新课程信息-->
+    <update id="updateCourse" parameterType="Course">
+        update s_course set name = #{courseName}, hours = #{courseHours}, academy_id = #{academyId} where id = #{courseId}
+    </update>
+
+    <!-- 删除课程信息-->
+    <delete id="deleteCourse" parameterType="int">
+        delete from s_course where id = #{courseId}
+    </delete>
+
+    <!--添加课程图片-->
+    <insert id="addCourseImg">
+        insert into course_img(course_img_name, course_id) values (#{arg0}, #{arg1})
+    </insert>
+
+    <!--删除课程图片-->
+    <delete id="deleteCourseImg" parameterType="int">
+        delete from course_img where course_id = #{courseId}
+    </delete>
+
+    <!--修改课程图片-->
+    <update id="updateCourseImg" >
+        update course_img set course_img_name = #{arg0} where course_id = #{arg1}
+    </update>
+
+    <resultMap id="BaseMap" type="java.util.Map">
+        <id column="id" property="courseId" jdbcType="INTEGER"/>
+        <result column="name" property="courseName" jdbcType="VARCHAR"/>
+        <result column="hours" property="courseHours" jdbcType="INTEGER"/>
+        <result column="academy_id" property="academyId" jdbcType="INTEGER"/>
+        <result column="academy_name" property="academyName" jdbcType="VARCHAR"/>
+        <result column="course_img_name" property="courseImg" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--根据课程ID查找课程相关所有信息-->
+    <select id="findCourseAndAcademyByCourseId" parameterType="int" resultMap="BaseMap">
+        select s.*, a.name as academy_name from s_course s left join s_academy a on s.academy_id = a.id where s.id=#{id}
+    </select>
+
+    <!--返回所有课程信息-->
+    <select id="findCourseAndAcademyAll"  resultMap="BaseMap">
+        select s.*, a.name as academy_name, img.course_img_name from s_course s left join s_academy a on s.academy_id = a.id left join course_img img on s.id = img.course_id;
+    </select>
+
+    <!--根据课程名称模糊查询所有课程信息-->
+    <select id="findCourseInfoByCourseName" parameterType="String" resultMap="BaseMap">
+        select s.*, a.name as academy_name, img.course_img_name from s_course s left join s_academy a on s.academy_id = a.id left join course_img img on s.id = img.course_id where s.name like concat('%',#{courseName},'%')
+    </select>
+</mapper>
